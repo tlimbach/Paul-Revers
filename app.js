@@ -227,17 +227,19 @@ function updatePaulGlow(samples) {
   let energy = 0;
   if (samples) for (const sample of samples) energy += sample * sample;
   const rms = samples?.length ? Math.sqrt(energy / samples.length) : 0;
-  const target = reducedMotion.matches ? 0 : Math.min(1, Math.max(0, (rms - .003) * 9) ** .65);
+  // Quiet phone recordings need a stronger visual response than a linear meter.
+  const target = reducedMotion.matches ? 0 : Math.min(1, Math.max(0, (rms - .002) * 28) ** .5);
   const now = performance.now();
   const elapsed = Math.min(.1, Math.max(0, (now - lastGlowTime) / 1000));
   lastGlowTime = now;
   // A quick response and slower release keep the glow lively without flickering.
-  const smoothing = 1 - Math.exp(-elapsed / (target > glowLevel ? .06 : .28));
+  const smoothing = 1 - Math.exp(-elapsed / (target > glowLevel ? .04 : .38));
   glowLevel += (target - glowLevel) * smoothing;
   if (glowLevel < .001) glowLevel = 0;
-  paul.style.setProperty('--voice-glow', `${(glowLevel * 7).toFixed(2)}px`);
-  paul.style.setProperty('--voice-halo', `${(glowLevel * 13).toFixed(2)}px`);
-  paul.style.setProperty('--voice-halo-opacity', (glowLevel * .65).toFixed(3));
+  paul.style.setProperty('--voice-glow', `${(glowLevel * 10).toFixed(2)}px`);
+  paul.style.setProperty('--voice-halo', `${(glowLevel * 20).toFixed(2)}px`);
+  paul.style.setProperty('--voice-halo-opacity', (glowLevel * .95).toFixed(3));
+  paul.style.setProperty('--voice-stroke', (2.4 + glowLevel * 1.2).toFixed(3));
   paul.style.setProperty('--voice-glow-opacity', glowLevel.toFixed(3));
 }
 
