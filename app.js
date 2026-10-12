@@ -7,6 +7,7 @@ const pen = canvas.getContext('2d');
 const waveIntro = $('wave-intro');
 const introForwardLight = $('intro-forward-light');
 const introReverseLight = $('intro-reverse-light');
+const introTexts = waveIntro.querySelectorAll('p span');
 const introAnimationStart = performance.now();
 const paulGlow = $('paul-glow');
 const paulOutline = $('paul-outline');
@@ -256,6 +257,8 @@ function draw() {
     const reverseX = 192 - 224 * Math.max(0, Math.min(1, (phase - .5) / .45));
     introForwardLight.setAttribute('gradientTransform', `translate(${forwardX} 0)`);
     introReverseLight.setAttribute('gradientTransform', `translate(${reverseX} 0)`);
+    introTexts[0].style.setProperty('--intro-light', `${forwardX / 160 * 100}%`);
+    introTexts[1].style.setProperty('--intro-light', `${reverseX / 160 * 100}%`);
   }
   const width = canvas.clientWidth, height = canvas.clientHeight, ratio = window.devicePixelRatio || 1;
   if (canvas.width !== Math.round(width * ratio) || canvas.height !== Math.round(height * ratio)) { canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio); }
