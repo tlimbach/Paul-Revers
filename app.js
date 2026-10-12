@@ -71,6 +71,7 @@ function stopRecording() {
 }
 recordButton.addEventListener('click', async () => {
   if (recording) { stopRecording(); return; }
+  document.body.classList.add('has-recorded');
   $('wave-intro').hidden = true;
   canvas.closest('.wave-panel').classList.remove('showing-intro');
   stopPlayback(); busy = true; syncControls();

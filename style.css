@@ -1,21 +1,21 @@
+@font-face{font-family:Orbitron;src:url("./fonts/Orbitron.ttf") format("truetype");font-style:normal;font-weight:400 900;font-display:swap}
 :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#f3f4ed;background:#101112;color-scheme:dark;font-synthesis:none;--green:#a0ff00;--purple:#b98aff;--red:#ff454f}
 *{box-sizing:border-box}
 body{margin:0}
 button,input{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .identity{display:flex;align-items:center;justify-content:space-between;max-width:760px;margin:auto;padding:22px 22px 18px;gap:20px}
-h1{font-size:64px;line-height:1;letter-spacing:-2.8px;margin:0;font-weight:850}
+h1{font-size:64px;line-height:1;letter-spacing:-2.8px;margin:0;font-weight:850;color:rgb(255 255 255 / 86%)}
 h1 span{color:var(--green)}
-.alien{width:82px;height:70px;flex-shrink:0;color:#39ff14;overflow:visible;transform:rotate(-8deg)}
+.alien{position:relative;z-index:10;width:82px;height:70px;flex-shrink:0;color:#39ff14;overflow:visible;transform-origin:top right;transform:rotate(-8deg);transition:transform .4s ease-in-out}
+.has-recorded .alien{transform:rotate(-8deg) scale(1.5)}
 main{max-width:760px;margin:auto;padding:0 22px calc(110px + env(safe-area-inset-bottom,0px))}
 .wave-panel{position:relative;border:1px solid #30352a;border-radius:18px;background:#12170f;overflow:hidden;background-image:linear-gradient(#a0ff0008 1px,transparent 1px),linear-gradient(90deg,#a0ff0008 1px,transparent 1px);background-size:32px 32px}
 canvas{display:block;width:100%;height:30vh;height:30svh;min-height:150px}
 .wave-intro{position:absolute;inset:0;display:grid;grid-template-rows:1fr 1fr;padding:8px 12px;color:#989d96;pointer-events:none;container-type:inline-size}
-.wave-intro p{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:0;width:100%;min-width:0;min-height:0;margin:0;text-align:left;font-size:clamp(33.6px,9.36cqw,67.2px);font-weight:850;letter-spacing:-.04em;line-height:1.05;white-space:nowrap}
+.wave-intro p{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:0;width:100%;min-width:0;min-height:0;margin:0;text-align:left;font-family:Orbitron,system-ui,sans-serif;font-size:clamp(24px,8.2cqw,59px);font-weight:600;letter-spacing:-.04em;line-height:1.05;white-space:nowrap}
 .wave-intro p:last-child{justify-self:end;align-items:flex-end;text-align:right}
 .wave-intro svg{display:block;width:100%;height:clamp(40px,5svh,52px);flex-shrink:0;stroke:none}
 .wave-intro p span{width:100%;color:transparent;background-image:linear-gradient(90deg,#989d96 calc(var(--intro-light,-20%) - 15%),#39ff14 calc(var(--intro-light,-20%) - 4.5%),#39ff14 calc(var(--intro-light,-20%) + 4.5%),#989d96 calc(var(--intro-light,-20%) + 15%));background-clip:text;-webkit-background-clip:text}
-.wave-intro p:first-child span{transform:skewX(-20deg);transform-origin:bottom left}
-.wave-intro p:last-child span{transform:skewX(25deg);transform-origin:bottom right}
 .wave-intro[hidden]{display:none}
 .showing-intro canvas,.showing-intro .wave-meta{visibility:hidden}
 .wave-meta{position:absolute;bottom:12px;right:15px;display:flex;align-items:center;gap:8px;color:#adb6a3;font:11px ui-monospace,monospace;font-variant-numeric:tabular-nums;pointer-events:none}
