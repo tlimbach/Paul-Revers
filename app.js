@@ -1,4 +1,4 @@
-import { reverseSamples, PlaybackClock } from './audio.js';
+import { reverseSamples, trimSilence, PlaybackClock } from './audio.js';
 
 const $ = (id) => document.getElementById(id);
 const recordButton = $('record');
@@ -75,8 +75,9 @@ recordButton.addEventListener('click', async () => {
       document.body.classList.remove('recording');
       try {
         if (data.samples.length < context.sampleRate * .15) throw new Error('short');
-        const decoded = context.createBuffer(1, data.samples.length, context.sampleRate);
-        decoded.copyToChannel(data.samples, 0);
+        const samples = trimSilence(data.samples, context.sampleRate);
+        const decoded = context.createBuffer(1, samples.length, context.sampleRate);
+        decoded.copyToChannel(samples, 0);
         original = decoded;
         displayedSamples = original.getChannelData(0);
         $('timer').textContent = formatTime(original.duration);
@@ -185,18 +186,22 @@ function draw() {
     const position = backwards ? 1 - progress : progress;
     const x = 7 + position * Math.max(0, width - 14);
     pen.save();
-    pen.strokeStyle = '#a01525';
-    pen.fillStyle = '#a01525';
+    const glow = pen.createLinearGradient(x - 16, 0, x + 16, 0);
+    glow.addColorStop(0, 'rgba(255, 0, 40, 0)');
+    glow.addColorStop(.35, 'rgba(255, 0, 40, .3)');
+    glow.addColorStop(.5, 'rgba(255, 0, 40, .95)');
+    glow.addColorStop(.65, 'rgba(255, 0, 40, .3)');
+    glow.addColorStop(1, 'rgba(255, 0, 40, 0)');
+    pen.fillStyle = glow;
+    pen.fillRect(x - 16, 0, 32, height);
+    pen.strokeStyle = '#ff8295';
+    pen.shadowColor = '#ff0028';
+    pen.shadowBlur = 14;
     pen.lineWidth = 1.5;
     pen.beginPath();
-    pen.moveTo(x, 12);
-    pen.lineTo(x, height - 12);
+    pen.moveTo(x, 0);
+    pen.lineTo(x, height);
     pen.stroke();
-    // Small handles keep the moving marker visible even over a loud waveform.
-    pen.beginPath();
-    pen.roundRect(x - 3, 5, 6, 10, 2);
-    pen.roundRect(x - 3, height - 15, 6, 10, 2);
-    pen.fill();
     pen.restore();
   }
   requestAnimationFrame(draw);

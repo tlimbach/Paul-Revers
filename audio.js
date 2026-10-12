@@ -3,6 +3,33 @@ export function reverseSamples(samples) {
   return Float32Array.from(samples).reverse();
 }
 
+/** Trim quiet edges only; keep internal pauses and a short safety margin. */
+export function trimSilence(samples, sampleRate) {
+  const frameSize = Math.max(1, Math.round(sampleRate * .02));
+  const levels = [];
+  for (let start = 0; start < samples.length; start += frameSize) {
+    const end = Math.min(start + frameSize, samples.length);
+    let energy = 0;
+    for (let i = start; i < end; i++) energy += samples[i] ** 2;
+    levels.push(Math.sqrt(energy / (end - start)));
+  }
+  const sorted = [...levels].sort((a, b) => a - b);
+  const peak = sorted.at(-1) || 0;
+  if (peak < .001) return samples.slice();
+  const noise = sorted[Math.floor(sorted.length * .2)] || 0;
+  const threshold = Math.max(.001, Math.min(peak * .2, Math.max(peak * .04, noise * 2.5)));
+  const first = levels.findIndex(level => level >= threshold);
+  let last = levels.length - 1;
+  while (last > first && levels[last] < threshold) last--;
+  const padding = Math.round(sampleRate * .1);
+  const minimumPause = sampleRate * .25;
+  const onset = first * frameSize;
+  const ending = Math.min(samples.length, (last + 1) * frameSize);
+  const start = onset >= minimumPause ? Math.max(0, onset - padding) : 0;
+  const end = samples.length - ending >= minimumPause ? Math.min(samples.length, ending + padding) : samples.length;
+  return samples.slice(start, end);
+}
+
 /** Integrate the same linear speed ramps used by the audio source. */
 export class PlaybackClock {
   constructor(time, rate) {
