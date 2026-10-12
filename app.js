@@ -1,4 +1,4 @@
-import { reverseSamples, trimSilence, PlaybackClock } from './audio.js';
+import { reverseSamples, trimSilence, PlaybackClock, createHallEffect, createDistortionEffect } from './audio.js';
 
 const $ = (id) => document.getElementById(id);
 const recordButton = $('record');
@@ -6,7 +6,9 @@ const canvas = $('wave');
 const pen = canvas.getContext('2d');
 let context, recorder, stream, analyser, mic, original, source;
 let workletReady;
+let hallEffect, distortionEffect, effectTailTimer;
 let recording = false, busy = false, backwards = true;
+let pendingPlayback = null;
 let startedAt = 0, playbackClock, playbackDuration = 0, limitTimer;
 let displayedSamples = null;
 const formatTime = (seconds) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
@@ -21,8 +23,10 @@ function syncControls() {
   recordButton.title = recordLabel;
   for (const [id, direction] of [['forward', false], ['reverse', true]]) {
     const active = Boolean(source) && backwards === direction;
-    $(id).disabled = !original || recording || busy;
-    const label = active ? 'Wiedergabe stoppen' : direction ? 'Rückwärts abspielen' : 'Vorwärts abspielen';
+    $(id).disabled = busy || (!original && !recording);
+    const label = recording
+      ? `Aufnahme beenden und ${direction ? 'rückwärts' : 'vorwärts'} abspielen`
+      : active ? 'Wiedergabe stoppen' : direction ? 'Rückwärts abspielen' : 'Vorwärts abspielen';
     $(id).setAttribute('aria-label', label);
     $(id).title = label;
     $(id).classList.toggle('selected', active);
@@ -35,7 +39,10 @@ async function audioContext() {
   return context;
 }
 function stopPlayback() {
+  clearTimeout(effectTailTimer);
   if (source) { source.onended = null; source.stop(); source.disconnect(); source = null; }
+  hallEffect?.dispose(); hallEffect = null;
+  distortionEffect?.dispose(); distortionEffect = null;
   syncControls();
 }
 function releaseMic() {
@@ -83,13 +90,20 @@ recordButton.addEventListener('click', async () => {
         $('timer').textContent = formatTime(original.duration);
         status('');
       } catch (error) {
+        pendingPlayback = null;
         status(error.message === 'short'
           ? 'Noch zu kurz! Sprich bitte mindestens eine Sekunde und stoppe dann die Aufnahme.'
           : 'Die Aufnahme konnte nicht verarbeitet werden. Bitte versuche es erneut.');
         console.error('Aufnahmeverarbeitung:', error);
       } finally { busy = false; syncControls(); }
+      if (pendingPlayback !== null) {
+        const direction = pendingPlayback;
+        pendingPlayback = null;
+        void playDirection(direction);
+      }
     };
     recorder.onprocessorerror = () => {
+      pendingPlayback = null;
       clearTimeout(limitTimer); recording = false; busy = false; releaseMic();
       recorder.disconnect(); recorder.port.close(); recorder = null;
       document.body.classList.remove('recording');
@@ -131,8 +145,28 @@ function updateEffects() {
   }
 }
 $('pitch').addEventListener('input', updateEffects);
-$('reset').addEventListener('click', () => { $('pitch').value = '0'; updateEffects(); });
+function updateHall() {
+  const amount = Number($('hall-amount').value);
+  $('hall-value').textContent = amount === 0 ? 'Aus' : `${amount} %`;
+  hallEffect?.setAmount(amount / 100);
+}
+$('hall-amount').addEventListener('input', updateHall);
+function updateDistortion() {
+  const amount = Number($('distortion-amount').value);
+  $('distortion-value').textContent = amount === 0 ? 'Aus' : `${amount} %`;
+  distortionEffect?.setAmount(amount / 100);
+}
+$('distortion-amount').addEventListener('input', updateDistortion);
+$('reset').addEventListener('click', () => {
+  $('pitch').value = '0'; $('hall-amount').value = '0'; $('distortion-amount').value = '0';
+  updateEffects(); updateHall(); updateDistortion();
+});
 async function playDirection(direction) {
+  if (recording && !busy) {
+    pendingPlayback = direction;
+    stopRecording();
+    return;
+  }
   if (!original || recording || busy) return;
   if (source && backwards === direction) { stopPlayback(); return; }
   stopPlayback();
@@ -147,16 +181,34 @@ async function playDirection(direction) {
     }
     const buffer = context.createBuffer(channels.length, channels[0].length, original.sampleRate);
     channels.forEach((data, c) => buffer.copyToChannel(data, c));
-    source = context.createBufferSource(); source.buffer = buffer; source.connect(context.destination);
+    source = context.createBufferSource(); source.buffer = buffer;
+    hallEffect = createHallEffect(context, Number($('hall-amount').value) / 100);
+    distortionEffect = createDistortionEffect(context, Number($('distortion-amount').value) / 100);
+    source.connect(distortionEffect.input);
+    distortionEffect.output.connect(hallEffect.input);
+    hallEffect.output.connect(context.destination);
     // Native resampling changes pitch and tempo together without granular overlap.
     source.playbackRate.value = 2 ** (Number($('pitch').value) / 12);
-    source.onended = () => { source?.disconnect(); source = null; syncControls(); };
+    source.onended = () => {
+      source?.disconnect(); source = null;
+      // Let the short delayed copies finish after the original voice ends.
+      effectTailTimer = setTimeout(() => {
+        hallEffect?.dispose(); hallEffect = null;
+        distortionEffect?.dispose(); distortionEffect = null;
+      }, 500);
+      syncControls();
+    };
     const startTime = context.currentTime;
     playbackClock = new PlaybackClock(startTime, source.playbackRate.value);
     playbackDuration = buffer.duration;
     source.start(startTime);
     status('');
-  } catch { status('Die Wiedergabe hat nicht geklappt. Versuche es noch einmal.'); }
+  } catch {
+    if (source) { source.onended = null; source.disconnect(); source = null; }
+    hallEffect?.dispose(); hallEffect = null;
+    distortionEffect?.dispose(); distortionEffect = null;
+    status('Die Wiedergabe hat nicht geklappt. Versuche es noch einmal.');
+  }
   finally { busy = false; syncControls(); }
 }
 
@@ -206,5 +258,5 @@ function draw() {
   }
   requestAnimationFrame(draw);
 }
-window.addEventListener('pagehide', () => { clearTimeout(limitTimer); releaseMic(); recorder?.disconnect(); recorder?.port.close(); source?.stop(); });
+window.addEventListener('pagehide', () => { clearTimeout(limitTimer); releaseMic(); recorder?.disconnect(); recorder?.port.close(); stopPlayback(); });
 draw();

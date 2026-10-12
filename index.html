@@ -32,12 +32,18 @@
       <p id="status" role="status" aria-live="polite"></p>
       <fieldset id="controls" disabled>
         <legend class="sr-only">Stimme verändern</legend>
-        <div class="effect-heading"><label for="pitch">Tonhöhe &amp; Tempo</label><output id="pitch-value" for="pitch">Normal</output><button id="reset" aria-label="Tonhöhe und Tempo zurücksetzen" title="Zurücksetzen" disabled>↺</button></div>
+        <div class="effect-heading"><label for="pitch">Pitch</label><output id="pitch-value" for="pitch">Normal</output><button id="reset" aria-label="Alle Effekte zurücksetzen" title="Alle Effekte zurücksetzen" disabled>↺</button></div>
         <input id="pitch" type="range" min="-12" max="12" step="1" value="0">
-        <div class="range-labels"><span>Tief &amp; langsam</span><span>Hoch &amp; schnell</span></div>
+        <div class="extra-effect">
+          <div class="effect-heading"><label for="hall-amount">Hall</label><output id="hall-value" for="hall-amount">Aus</output></div>
+          <input id="hall-amount" type="range" min="0" max="200" step="1" value="0">
+        </div>
+        <div class="extra-effect">
+          <div class="effect-heading"><label for="distortion-amount">Verzerrung</label><output id="distortion-value" for="distortion-amount">Aus</output></div>
+          <input id="distortion-amount" type="range" min="0" max="200" step="1" value="0">
+        </div>
       </fieldset>
     </section>
-    <footer>Deine Stimme bleibt auf deinem Gerät.</footer>
   </main>
 </body>
 </html>

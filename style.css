@@ -41,6 +41,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;heigh
 input[type=range]::-moz-range-track{height:6px;background:#3c4433;border-radius:8px}
 input[type=range]::-moz-range-thumb{box-sizing:border-box;width:30px;height:30px;background:var(--green);border:4px solid #101112;border-radius:50%;box-shadow:0 0 0 1px var(--green)}
 .range-labels{display:flex;justify-content:space-between;font-size:11px;color:#989f90}
+.extra-effect{margin-top:22px;padding-top:18px;border-top:1px solid #30322c;scroll-margin-block:80px}
 footer{text-align:center;font-size:10px;letter-spacing:.2px;color:#7f8776;margin-top:28px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 @media(min-width:700px){.identity{padding-top:32px;padding-bottom:20px}h1{font-size:80px}.alien{width:100px;height:85px}.transport-button{min-height:96px}}

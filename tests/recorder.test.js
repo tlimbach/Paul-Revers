@@ -11,7 +11,7 @@ function createRecorder(sampleRate = 8000) {
     AudioWorkletProcessor: class {
       port = { postMessage: message => messages.push(message) };
     },
-    registerProcessor: (_, implementation) => { Recorder = implementation; }
+    registerProcessor: (name, implementation) => { if (name === 'voice-recorder') Recorder = implementation; }
   });
   return { recorder: new Recorder(), messages };
 }
