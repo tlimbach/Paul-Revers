@@ -6,6 +6,8 @@ button,input{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 h1{font-size:64px;line-height:1;letter-spacing:-2.8px;margin:0;font-weight:850}
 h1 span{color:var(--green)}
 .alien{width:82px;height:70px;flex-shrink:0;color:var(--green);transform:rotate(-8deg)}
+.alien{color:#39ff14;overflow:visible;filter:drop-shadow(0 0 var(--voice-halo,0px) rgba(0,255,50,var(--voice-halo-opacity,0)))}
+.alien path{fill:none;filter:drop-shadow(0 0 var(--voice-glow,0px) rgba(40,255,0,var(--voice-glow-opacity,0)))}
 main{max-width:760px;margin:auto;padding:0 22px calc(110px + env(safe-area-inset-bottom,0px))}
 .wave-panel{position:relative;border:1px solid #30352a;border-radius:18px;background:#12170f;overflow:hidden;background-image:linear-gradient(#a0ff0008 1px,transparent 1px),linear-gradient(90deg,#a0ff0008 1px,transparent 1px);background-size:32px 32px}
 canvas{display:block;width:100%;height:30vh;height:30svh;min-height:150px}
@@ -45,5 +47,11 @@ input[type=range]::-moz-range-thumb{box-sizing:border-box;width:30px;height:30px
 footer{text-align:center;font-size:10px;letter-spacing:.2px;color:#7f8776;margin-top:28px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 @media(min-width:700px){.identity{padding-top:32px;padding-bottom:20px}h1{font-size:80px}.alien{width:100px;height:85px}.transport-button{min-height:96px}}
+@media(max-width:699px){
+  /* Save roughly 30% in the effects section while keeping 44px touch targets. */
+  fieldset{padding-top:8px}
+  input[type=range]{display:block;height:44px;margin:0}
+  .extra-effect{margin-top:0;padding-top:4px}
+}
 @media(max-width:360px){main{padding-left:14px;padding-right:14px}.transport{gap:10px}.transport-button{min-height:72px}.identity{padding:16px 14px}h1{font-size:58px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}

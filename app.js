@@ -4,6 +4,11 @@ const $ = (id) => document.getElementById(id);
 const recordButton = $('record');
 const canvas = $('wave');
 const pen = canvas.getContext('2d');
+const paul = document.querySelector('.alien');
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let glowLevel = 0, lastGlowTime = performance.now();
+let playbackAnalyser, playbackLevels;
+const micLevels = new Float32Array(2048);
 let context, recorder, stream, analyser, mic, original, source;
 let workletReady;
 let hallEffect, distortionEffect, effectTailTimer;
@@ -186,7 +191,13 @@ async function playDirection(direction) {
     distortionEffect = createDistortionEffect(context, Number($('distortion-amount').value) / 100);
     source.connect(distortionEffect.input);
     distortionEffect.output.connect(hallEffect.input);
-    hallEffect.output.connect(context.destination);
+    if (!playbackAnalyser) {
+      playbackAnalyser = context.createAnalyser();
+      playbackAnalyser.fftSize = 2048;
+      playbackLevels = new Float32Array(playbackAnalyser.fftSize);
+      playbackAnalyser.connect(context.destination);
+    }
+    hallEffect.output.connect(playbackAnalyser);
     // Native resampling changes pitch and tempo together without granular overlap.
     source.playbackRate.value = 2 ** (Number($('pitch').value) / 12);
     source.onended = () => {
@@ -212,15 +223,40 @@ async function playDirection(direction) {
   finally { busy = false; syncControls(); }
 }
 
+function updatePaulGlow(samples) {
+  let energy = 0;
+  if (samples) for (const sample of samples) energy += sample * sample;
+  const rms = samples?.length ? Math.sqrt(energy / samples.length) : 0;
+  const target = reducedMotion.matches ? 0 : Math.min(1, Math.max(0, (rms - .003) * 9) ** .65);
+  const now = performance.now();
+  const elapsed = Math.min(.1, Math.max(0, (now - lastGlowTime) / 1000));
+  lastGlowTime = now;
+  // A quick response and slower release keep the glow lively without flickering.
+  const smoothing = 1 - Math.exp(-elapsed / (target > glowLevel ? .06 : .28));
+  glowLevel += (target - glowLevel) * smoothing;
+  if (glowLevel < .001) glowLevel = 0;
+  paul.style.setProperty('--voice-glow', `${(glowLevel * 7).toFixed(2)}px`);
+  paul.style.setProperty('--voice-halo', `${(glowLevel * 13).toFixed(2)}px`);
+  paul.style.setProperty('--voice-halo-opacity', (glowLevel * .65).toFixed(3));
+  paul.style.setProperty('--voice-glow-opacity', glowLevel.toFixed(3));
+}
+
 function draw() {
   const width = canvas.clientWidth, height = canvas.clientHeight, ratio = window.devicePixelRatio || 1;
   if (canvas.width !== Math.round(width * ratio) || canvas.height !== Math.round(height * ratio)) { canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio); }
   pen.setTransform(ratio, 0, 0, ratio, 0, 0); pen.clearRect(0, 0, width, height);
   let data = displayedSamples;
+  let liveSamples = null;
   if (recording && analyser) {
-    data = new Float32Array(analyser.fftSize); analyser.getFloatTimeDomainData(data);
+    analyser.getFloatTimeDomainData(micLevels);
+    data = micLevels;
+    liveSamples = micLevels;
     $('timer').textContent = `${formatTime(Math.min(60, (performance.now() - startedAt) / 1000))} / 1:00`;
+  } else if (hallEffect && playbackAnalyser) {
+    playbackAnalyser.getFloatTimeDomainData(playbackLevels);
+    liveSamples = playbackLevels;
   }
+  updatePaulGlow(liveSamples);
   const count = Math.floor(width / 7);
   const progress = source ? Math.min(1, playbackClock.positionAt(context.currentTime) / playbackDuration) : 0;
   for (let i = 0; i < count; i++) {
