@@ -4,7 +4,8 @@ const $ = (id) => document.getElementById(id);
 const recordButton = $('record');
 const canvas = $('wave');
 const pen = canvas.getContext('2d');
-const paul = document.querySelector('.alien');
+const paulGlow = $('paul-glow');
+const paulOutline = $('paul-outline');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let glowLevel = 0, lastGlowTime = performance.now();
 let playbackAnalyser, playbackLevels;
@@ -236,11 +237,9 @@ function updatePaulGlow(samples) {
   const smoothing = 1 - Math.exp(-elapsed / (target > glowLevel ? .04 : .38));
   glowLevel += (target - glowLevel) * smoothing;
   if (glowLevel < .001) glowLevel = 0;
-  paul.style.setProperty('--voice-glow', `${(glowLevel * 10).toFixed(2)}px`);
-  paul.style.setProperty('--voice-halo', `${(glowLevel * 20).toFixed(2)}px`);
-  paul.style.setProperty('--voice-halo-opacity', (glowLevel * .95).toFixed(3));
-  paul.style.setProperty('--voice-stroke', (2.4 + glowLevel * 1.2).toFixed(3));
-  paul.style.setProperty('--voice-glow-opacity', glowLevel.toFixed(3));
+  // Animate explicit SVG attributes, avoiding nested CSS drop-shadow filters.
+  paulGlow.setAttribute('opacity', glowLevel.toFixed(3));
+  paulOutline.setAttribute('stroke-width', (2.4 + glowLevel * 1.2).toFixed(3));
 }
 
 function draw() {
