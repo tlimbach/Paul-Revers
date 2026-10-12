@@ -26,6 +26,7 @@ const formatTime = (seconds) => `${Math.floor(seconds / 60)}:${String(Math.floor
 
 function status(message) { $('status').textContent = message; }
 function syncControls() {
+  document.body.classList.toggle('audio-active', recording || Boolean(source));
   $('controls').disabled = !original || recording || busy;
   $('reset').disabled = !original || recording || busy;
   recordButton.disabled = busy;
@@ -71,7 +72,6 @@ function stopRecording() {
 }
 recordButton.addEventListener('click', async () => {
   if (recording) { stopRecording(); return; }
-  document.body.classList.add('has-recorded');
   $('wave-intro').hidden = true;
   canvas.closest('.wave-panel').classList.remove('showing-intro');
   stopPlayback(); busy = true; syncControls();

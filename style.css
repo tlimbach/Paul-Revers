@@ -7,7 +7,7 @@ button,input{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 h1{font-size:64px;line-height:1;letter-spacing:-2.8px;margin:0;font-weight:850;color:rgb(255 255 255 / 86%)}
 h1 span{color:var(--green)}
 .alien{position:relative;z-index:10;width:82px;height:70px;flex-shrink:0;color:#39ff14;overflow:visible;transform-origin:top right;transform:rotate(-8deg);transition:transform .4s ease-in-out}
-.has-recorded .alien{transform:rotate(-8deg) scale(1.5)}
+.audio-active .alien{transform:rotate(-8deg) scale(1.5)}
 main{max-width:760px;margin:auto;padding:0 22px calc(110px + env(safe-area-inset-bottom,0px))}
 .wave-panel{position:relative;border:1px solid #30352a;border-radius:18px;background:#12170f;overflow:hidden;background-image:linear-gradient(#a0ff0008 1px,transparent 1px),linear-gradient(90deg,#a0ff0008 1px,transparent 1px);background-size:32px 32px}
 canvas{display:block;width:100%;height:30vh;height:30svh;min-height:150px}
