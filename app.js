@@ -1,4 +1,4 @@
-import { reverseSamples, transformSamples } from './audio.js';
+import { reverseSamples } from './audio.js';
 
 const $ = (id) => document.getElementById(id);
 const recordButton = $('record');
@@ -125,13 +125,11 @@ $('forward').addEventListener('click', () => playDirection(false));
 $('reverse').addEventListener('click', () => playDirection(true));
 function updateEffects() {
   stopPlayback();
-  $('speed-value').textContent = `${Number($('speed').value).toFixed(1).replace('.', ',')}×`;
   const pitch = Number($('pitch').value);
-  $('pitch-value').textContent = pitch === 0 ? 'Normal' : `${pitch > 0 ? '+' : '−'}${Math.abs(pitch)} Halbtöne`;
+  $('pitch-value').textContent = pitch === 0 ? 'Normal' : `${(2 ** (pitch / 12)).toFixed(2).replace('.', ',')}×`;
 }
-$('speed').addEventListener('input', updateEffects);
 $('pitch').addEventListener('input', updateEffects);
-$('reset').addEventListener('click', () => { $('speed').value = '1'; $('pitch').value = '0'; updateEffects(); });
+$('reset').addEventListener('click', () => { $('pitch').value = '0'; updateEffects(); });
 async function playDirection(direction) {
   if (!original || recording || busy) return;
   if (source && backwards === direction) { stopPlayback(); return; }
@@ -143,13 +141,15 @@ async function playDirection(direction) {
     const channels = [];
     for (let c = 0; c < original.numberOfChannels; c++) {
       const samples = original.getChannelData(c);
-      channels.push(transformSamples(backwards ? reverseSamples(samples) : samples, original.sampleRate, Number($('speed').value), Number($('pitch').value)));
+      channels.push(backwards ? reverseSamples(samples) : samples);
     }
     const buffer = context.createBuffer(channels.length, channels[0].length, original.sampleRate);
     channels.forEach((data, c) => buffer.copyToChannel(data, c));
     source = context.createBufferSource(); source.buffer = buffer; source.connect(context.destination);
+    // Native resampling changes pitch and tempo together without granular overlap.
+    source.playbackRate.value = 2 ** (Number($('pitch').value) / 12);
     source.onended = () => { source?.disconnect(); source = null; syncControls(); };
-    playbackStarted = context.currentTime; playbackDuration = buffer.duration;
+    playbackStarted = context.currentTime; playbackDuration = buffer.duration / source.playbackRate.value;
     source.start();
     status(backwards ? 'Ohren auf: So klingst du rückwärts!' : 'Ohren auf: So klingst du vorwärts!');
   } catch { status('Die Wiedergabe hat nicht geklappt. Versuche es noch einmal.'); }
