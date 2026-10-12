@@ -56,7 +56,7 @@ recordButton.addEventListener('click', async () => {
     status('Erlaube das Mikrofon im Browser, damit Paul dich hören kann.');
     stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     // Capture PCM directly: no browser-specific compressed format to decode.
-    workletReady ??= context.audioWorklet.addModule('/recorder-worklet.js').catch(error => {
+    workletReady ??= context.audioWorklet.addModule(new URL('./recorder-worklet.js', import.meta.url)).catch(error => {
       workletReady = null; throw error;
     });
     await workletReady;
