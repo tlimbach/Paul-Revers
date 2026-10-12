@@ -1,0 +1,42 @@
+:root{font-family:ui-rounded,"Arial Rounded MT Bold",system-ui,-apple-system,sans-serif;color:#242943;background:#f7f5ed;font-synthesis:none}*{box-sizing:border-box}body{margin:0}.topbar{max-width:1120px;margin:auto;padding:28px 30px;display:flex;justify-content:space-between;align-items:center}.brand{display:flex;gap:10px;align-items:center;font-weight:900;letter-spacing:1px;font-size:18px;text-decoration:none;color:inherit}.brand-icon{background:#7760d6;color:white;border-radius:12px;padding:0 8px;font-size:30px}.brand-dot{font-size:10px;color:#f08467}.header-note{font-size:13px;color:#6c6d7b}main{max-width:1020px;margin:auto;padding:16px 30px 22px}.intro{display:flex;align-items:center;justify-content:space-between;padding:20px 35px 35px 0}.eyebrow{font-size:11px;font-weight:850;letter-spacing:1.9px;color:#7862bd}h1{font-size:clamp(36px,5vw,58px);line-height:1.09;letter-spacing:-2px;margin:15px 0 18px}h1 span{color:#7760d6}.intro p{font-size:16px;line-height:1.7;color:#72717c;margin:0}.mascot{position:relative;min-width:230px;text-align:center;padding-top:35px}.creature{width:180px;height:151px;background:#bcb0f0;border:3px solid #292842;border-radius:70px 65px 55px 55px;transform:rotate(-7deg);margin:20px auto 17px;box-shadow:7px 8px 0 #e4dfed;position:relative}.creature:before,.creature:after{content:"";position:absolute;top:60px;width:23px;height:42px;background:#bcb0f0;border:3px solid #292842;border-radius:20px}.creature:before{left:-20px;transform:rotate(-25deg)}.creature:after{right:-20px;transform:rotate(25deg)}.eyes{display:flex;gap:14px;justify-content:center;padding-top:33px}.eyes i{width:36px;height:45px;background:white;border:2px solid #292842;border-radius:50%;position:relative}.eyes i:after{content:"";position:absolute;background:#292842;width:12px;height:18px;border-radius:50%;bottom:9px;left:13px}.mouth{width:31px;height:17px;border:3px solid #292842;border-top:0;border-radius:0 0 30px 30px;margin:12px auto}.cheek{position:absolute;top:88px;width:22px;height:10px;background:#f499a4;border-radius:50%}.left{left:22px}.right{right:22px}.speech{position:absolute;right:-6px;top:8px;background:white;border:2px solid #292842;padding:10px 17px;border-radius:18px 18px 18px 0;font-weight:800;transform:rotate(7deg);z-index:1}.orbit{position:absolute;left:-25px;top:40px;font-size:42px;color:#e9ac44}.mascot-label{font-size:9px;letter-spacing:2px;color:#8c849e;font-weight:800}.lab{background:white;border:1px solid #e7e4ec;border-radius:24px;box-shadow:0 8px 0 #ebe8e0;overflow:hidden}.recorder,.playback{padding:27px 32px}.recorder{border-bottom:1px solid #ece9f0}.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:20px}h2{display:flex;align-items:center;gap:10px;font-size:18px;margin:0;letter-spacing:-.4px}.step{display:inline-grid;place-items:center;background:#eeebfa;color:#7760d6;font-size:12px;border-radius:50%;width:25px;height:25px}.badge{font-size:9px;letter-spacing:1px;background:#f4f4f2;border-radius:20px;padding:7px 10px;color:#787987;font-weight:750}.wave-panel{background:#f8f7fc;border-radius:14px;padding:15px 18px 12px}canvas{display:block;width:100%;height:76px}.wave-caption{display:flex;justify-content:space-between;font-size:11px;color:#858194;gap:12px}time{font-variant-numeric:tabular-nums}.record-actions{display:flex;align-items:center;gap:18px;margin-top:19px}.button{border:0;border-radius:12px;font:inherit;font-weight:750;cursor:pointer;padding:15px 23px;display:flex;justify-content:center;align-items:center;gap:11px;transition:transform .15s,background .15s}.button:hover:enabled{transform:translateY(-2px)}.record{background:#f38068;color:#262940;box-shadow:0 4px 0 #d65f4c}.record span{font-size:21px}#record-hint{font-size:12px;color:#83808c}#status{font-size:12px;color:#767184;margin:17px 0 0;min-height:18px}.text-button{border:0;background:none;color:#797282;font:inherit;font-size:12px;cursor:pointer;padding:8px}fieldset{border:0;margin:0;padding:0;min-width:0}.directions{display:grid;grid-template-columns:1fr 1fr;gap:13px}.direction{background:white;border:2px solid #eae7ef;border-radius:13px;padding:15px;font:inherit;font-weight:800;color:#666473;cursor:pointer;text-align:left;display:grid;grid-template-columns:35px 1fr;align-items:center}.direction>span{grid-row:span 2;font-size:29px;font-weight:400}.direction small{font-size:11px;font-weight:400;margin-top:3px}.direction.selected{border-color:#8c76dc;background:#f1edff;color:#6e54bd}.sliders{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin:24px 0}.slider-card label{display:flex;justify-content:space-between;font-size:13px;font-weight:750;align-items:center}output{background:#f0edf7;color:#735cb8;padding:4px 10px;border-radius:6px;font-size:11px}input[type=range]{width:100%;accent-color:#8163d3;cursor:pointer;margin:17px 0 10px;height:20px}.range-labels{display:flex;justify-content:space-between;font-size:10px;color:#88828e}.play{width:100%;background:#7961cf;color:#fff;box-shadow:0 4px 0 #5b45a4}.play-hint{text-align:center;font-size:11px;color:#898391;margin:15px 0 0}button:disabled{cursor:default;opacity:.5}fieldset:disabled{opacity:.55}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #262943;outline-offset:4px}.challenge{display:flex;align-items:center;gap:17px;margin:26px 0 24px;background:#f8edcb;border:1px solid #eee1b8;border-radius:15px;padding:19px 23px}.challenge .eyebrow{color:#9d803d;font-size:9px}.challenge p{font-size:13px;margin:5px 0 0;color:#756343}.challenge-icon{font-size:33px;color:#c09338}.banana{margin-left:auto;font-size:29px;transform:rotate(-15deg)}footer{display:flex;justify-content:space-between;gap:20px;font-size:10px;color:#938d99;padding:0 2px}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}body.recording .badge{color:#aa3b2e;background:#ffebe5}body.recording .creature{animation:wiggle .7s infinite alternate}@keyframes wiggle{to{transform:rotate(7deg)}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}/* Large touch targets and a compact phone layout keep the controls close. */
+button, input, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+.text-button { min-height:44px; }
+.direction { min-height:76px; }
+input[type=range] { min-height:44px; margin:5px 0; }
+.sliders { margin-bottom:0; }
+@media(max-width:640px){
+  .topbar{padding:16px 20px 12px;justify-content:center}
+  .brand{font-size:20px;gap:10px}
+  .brand-icon{font-size:32px}
+  .header-note{display:none}
+  main{padding:0 12px max(18px,env(safe-area-inset-bottom))}
+  .intro{padding:10px 8px 18px;display:block;text-align:center}
+  .intro .eyebrow,.intro p,.mascot{display:none}
+  h1{font-size:25px;letter-spacing:-.8px;line-height:1.2;margin:0}
+  h1 br{display:none}
+  h1 span:before{content:' '}
+  .lab{border-radius:20px}
+  .recorder,.playback{padding:16px}
+  .section-title{margin-bottom:12px;flex-wrap:wrap;gap:6px}
+  h2{font-size:17px}
+  .badge{font-size:8px;padding:6px 8px;letter-spacing:.4px}
+  .wave-panel{padding:10px 12px}
+  canvas{height:52px}
+  .wave-caption{font-size:10px;align-items:center}
+  time{white-space:nowrap}
+  .record-actions{margin-top:12px;display:block}
+  .record{width:100%;min-height:54px;font-size:17px}
+  #record-hint{display:none}
+  #status{font-size:12px;line-height:1.4;margin:12px 0 0}
+  .directions{gap:10px}
+  .direction{padding:12px 10px;font-size:16px;grid-template-columns:29px 1fr;min-height:76px}
+  .direction small{font-size:12px}
+  .sliders{grid-template-columns:1fr;gap:16px;margin-top:18px}
+  .slider-card label{font-size:15px}
+  output{font-size:12px}
+  .range-labels{font-size:12px}
+  .challenge{padding:14px;margin:20px 0 18px;gap:10px}
+  .challenge p{font-size:12px;line-height:1.5}
+  .banana{font-size:24px}
+  footer{flex-direction:column;gap:8px;text-align:center;font-size:11px;line-height:1.5}
+}

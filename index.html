@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ed">
+  <title>Paul Revers · Deine Stimme steht Kopf!</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/" aria-label="Paul Revers Startseite"><span class="brand-icon">↔</span> PAUL REVERS<span class="brand-dot">●</span></a><span class="header-note">Das verrückte Stimmenlabor</span></header>
+  <main>
+    <section class="intro">
+      <div><span class="eyebrow">HALLO, STIMMENFORSCHER!</span><h1>Deine Stimme.<br><span>Völlig verdreht.</span></h1><p>Einmal quatschen. Rückwärts lachen.<br>Entdecke, was alles in deiner Stimme steckt!</p></div>
+      <div class="mascot" aria-hidden="true"><span class="orbit">✦</span><div class="speech">Hallo? … ollaH!</div><div class="creature"><div class="eyes"><i></i><i></i></div><div class="mouth"></div><span class="cheek left"></span><span class="cheek right"></span></div><span class="mascot-label">PAUL IST GANZ OHR.</span></div>
+    </section>
+    <section class="lab" aria-label="Dein Stimmenlabor">
+      <div class="recorder">
+        <div class="section-title"><h2><span class="step">1</span> Deine Aufnahme</h2><span id="record-badge" class="badge">BEREIT, WENN DU ES BIST</span></div>
+        <div class="wave-panel"><canvas id="wave" aria-label="Wellenform deiner Aufnahme"></canvas><div class="wave-caption"><span id="wave-label">Hier kommt deine Stimme hin</span><time id="timer">0:00 / 1:00</time></div></div>
+        <div class="record-actions"><button id="record" class="button record"><span aria-hidden="true">●</span> Aufnahme starten</button><span id="record-hint">Drück drauf und sag etwas Lustiges!</span></div>
+        <p id="status" role="status" aria-live="polite">Das Mikrofon wird erst beim Aufnehmen eingeschaltet.</p>
+      </div>
+      <div class="playback">
+        <div class="section-title"><h2><span class="step">2</span> Einmal verdrehen</h2><button id="reset" class="text-button" disabled>↺ Zurücksetzen</button></div>
+        <fieldset id="controls" disabled><legend class="sr-only">Abspielrichtung und Effekte</legend>
+          <div class="directions"><button id="forward" class="direction" aria-pressed="false"><span>→</span> Vorwärts<small>Jetzt abspielen</small></button><button id="reverse" class="direction" aria-pressed="false"><span>←</span> Rückwärts<small>Jetzt abspielen</small></button></div>
+          <div class="sliders"><div class="slider-card"><label for="speed">Tempo <output id="speed-value" for="speed">1,0×</output></label><input id="speed" type="range" min="0.5" max="1.5" step="0.1" value="1"><div class="range-labels"><span>🐢 Gemütlich</span><span>Flitzeschnell 🐇</span></div></div><div class="slider-card"><label for="pitch">Tonhöhe <output id="pitch-value" for="pitch">Normal</output></label><input id="pitch" type="range" min="-7" max="7" step="1" value="0"><div class="range-labels"><span>🐻 Brummbär</span><span>Piepsmaus 🐭</span></div></div></div>
+        </fieldset>
+      </div>
+    </section>
+    <aside class="challenge"><span class="challenge-icon" aria-hidden="true">✧</span><div><span class="eyebrow">PAULS QUATSCH-IDEE</span><p>Sag mal <strong>„Hallo, du Banane!“</strong> und hör es rückwärts.</p></div><span class="banana" aria-hidden="true">🍌</span></aside>
+    <footer><span>♡ Deine Stimme bleibt bei dir. Kein Upload. Kein Konto.</span><span>Mit Neugier gemacht · Paul Revers</span></footer>
+  </main>
+</body>
+</html>
