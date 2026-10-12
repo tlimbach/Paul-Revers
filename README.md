@@ -10,7 +10,7 @@ Voraussetzung: Node.js ab Version 18. Keine zusätzlichen Pakete nötig.
 npm start
 ```
 
-Im Browser **http://localhost:3000** öffnen. Auf „Aufnahme starten“ drücken und den Mikrofonzugriff erlauben. Nach der Aufnahme startet „Vorwärts“ oder „Rückwärts“ direkt die Wiedergabe. Erneutes Tippen auf die aktive Richtung stoppt sie; die andere Richtung startet von vorn. Nach höchstens 60 Sekunden endet die Aufnahme automatisch. Eine neue erfolgreiche Aufnahme ersetzt die vorherige. Beim Schließen oder Neuladen verschwindet die Aufnahme.
+Im Browser **http://localhost:3000** öffnen. Auf „Aufnahme starten“ drücken und den Mikrofonzugriff erlauben. Nach der Aufnahme startet „Vorwärts“ oder „Rückwärts“ direkt die Wiedergabe. Die Wiedergabe wiederholt sich endlos, während Tempo und Effekte weiter veränderbar bleiben. Erneutes Tippen auf die aktive Richtung stoppt sie; die andere Richtung startet von vorn. Nach höchstens 60 Sekunden endet die Aufnahme automatisch. Eine neue erfolgreiche Aufnahme ersetzt die vorherige. Beim Schließen oder Neuladen verschwindet die Aufnahme.
 
 Das Mikrofon funktioniert über localhost oder HTTPS. Für eine spätere Veröffentlichung ist HTTPS erforderlich; direktes Öffnen der HTML-Datei ist nicht vorgesehen. Die App verwendet AudioWorklet und die Web Audio API und richtet sich an aktuelle Browser mit diesen Funktionen.
 

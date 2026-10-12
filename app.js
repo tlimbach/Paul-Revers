@@ -4,6 +4,10 @@ const $ = (id) => document.getElementById(id);
 const recordButton = $('record');
 const canvas = $('wave');
 const pen = canvas.getContext('2d');
+const waveIntro = $('wave-intro');
+const introForwardLight = $('intro-forward-light');
+const introReverseLight = $('intro-reverse-light');
+const introAnimationStart = performance.now();
 const paulGlow = $('paul-glow');
 const paulOutline = $('paul-outline');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -66,6 +70,8 @@ function stopRecording() {
 }
 recordButton.addEventListener('click', async () => {
   if (recording) { stopRecording(); return; }
+  $('wave-intro').hidden = true;
+  canvas.closest('.wave-panel').classList.remove('showing-intro');
   stopPlayback(); busy = true; syncControls();
   try {
     if (!navigator.mediaDevices?.getUserMedia || !window.AudioWorkletNode) throw new Error('unsupported');
@@ -188,6 +194,7 @@ async function playDirection(direction) {
     const buffer = context.createBuffer(channels.length, channels[0].length, original.sampleRate);
     channels.forEach((data, c) => buffer.copyToChannel(data, c));
     source = context.createBufferSource(); source.buffer = buffer;
+    source.loop = true;
     hallEffect = createHallEffect(context, Number($('hall-amount').value) / 100);
     distortionEffect = createDistortionEffect(context, Number($('distortion-amount').value) / 100);
     source.connect(distortionEffect.input);
@@ -243,6 +250,13 @@ function updatePaulGlow(samples) {
 }
 
 function draw() {
+  if (!waveIntro.hidden && !reducedMotion.matches) {
+    const phase = ((performance.now() - introAnimationStart) % 2400) / 2400;
+    const forwardX = -32 + 224 * Math.min(1, phase / .45);
+    const reverseX = 192 - 224 * Math.max(0, Math.min(1, (phase - .5) / .45));
+    introForwardLight.setAttribute('gradientTransform', `translate(${forwardX} 0)`);
+    introReverseLight.setAttribute('gradientTransform', `translate(${reverseX} 0)`);
+  }
   const width = canvas.clientWidth, height = canvas.clientHeight, ratio = window.devicePixelRatio || 1;
   if (canvas.width !== Math.round(width * ratio) || canvas.height !== Math.round(height * ratio)) { canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio); }
   pen.setTransform(ratio, 0, 0, ratio, 0, 0); pen.clearRect(0, 0, width, height);
@@ -259,7 +273,7 @@ function draw() {
   }
   updatePaulGlow(liveSamples);
   const count = Math.floor(width / 7);
-  const progress = source ? Math.min(1, playbackClock.positionAt(context.currentTime) / playbackDuration) : 0;
+  const progress = source ? (playbackClock.positionAt(context.currentTime) % playbackDuration) / playbackDuration : 0;
   for (let i = 0; i < count; i++) {
     let amplitude = 0;
     if (data?.length) {
@@ -275,18 +289,18 @@ function draw() {
     const position = backwards ? 1 - progress : progress;
     const x = 7 + position * Math.max(0, width - 14);
     pen.save();
-    const glow = pen.createLinearGradient(x - 16, 0, x + 16, 0);
+    const glow = pen.createLinearGradient(x - 10, 0, x + 10, 0);
     glow.addColorStop(0, 'rgba(255, 0, 40, 0)');
     glow.addColorStop(.35, 'rgba(255, 0, 40, .3)');
     glow.addColorStop(.5, 'rgba(255, 0, 40, .95)');
     glow.addColorStop(.65, 'rgba(255, 0, 40, .3)');
     glow.addColorStop(1, 'rgba(255, 0, 40, 0)');
     pen.fillStyle = glow;
-    pen.fillRect(x - 16, 0, 32, height);
+    pen.fillRect(x - 10, 0, 20, height);
     pen.strokeStyle = '#ff8295';
     pen.shadowColor = '#ff0028';
-    pen.shadowBlur = 14;
-    pen.lineWidth = 1.5;
+    pen.shadowBlur = 9;
+    pen.lineWidth = 1;
     pen.beginPath();
     pen.moveTo(x, 0);
     pen.lineTo(x, height);

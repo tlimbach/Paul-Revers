@@ -9,6 +9,14 @@ h1 span{color:var(--green)}
 main{max-width:760px;margin:auto;padding:0 22px calc(110px + env(safe-area-inset-bottom,0px))}
 .wave-panel{position:relative;border:1px solid #30352a;border-radius:18px;background:#12170f;overflow:hidden;background-image:linear-gradient(#a0ff0008 1px,transparent 1px),linear-gradient(90deg,#a0ff0008 1px,transparent 1px);background-size:32px 32px}
 canvas{display:block;width:100%;height:30vh;height:30svh;min-height:150px}
+.wave-intro{position:absolute;inset:0;display:grid;grid-template-rows:1fr 1fr;padding:8px 12px;color:#989d96;pointer-events:none;container-type:inline-size}
+.wave-intro p{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:0;width:100%;min-width:0;min-height:0;margin:0;text-align:left;font-size:clamp(33.6px,9.36cqw,67.2px);font-weight:850;letter-spacing:-.04em;line-height:1.05;white-space:nowrap}
+.wave-intro p:last-child{justify-self:end;align-items:flex-end;text-align:right}
+.wave-intro svg{display:block;width:100%;height:clamp(40px,5svh,52px);flex-shrink:0;stroke:none}
+.wave-intro p:first-child span{transform:skewX(-20deg);transform-origin:bottom left}
+.wave-intro p:last-child span{transform:skewX(25deg);transform-origin:bottom right}
+.wave-intro[hidden]{display:none}
+.showing-intro canvas,.showing-intro .wave-meta{visibility:hidden}
 .wave-meta{position:absolute;bottom:12px;right:15px;display:flex;align-items:center;gap:8px;color:#adb6a3;font:11px ui-monospace,monospace;font-variant-numeric:tabular-nums;pointer-events:none}
 .signal-light{width:5px;height:5px;border-radius:50%;background:#68735f}
 .recording .signal-light{background:var(--red);box-shadow:0 0 8px #ff454faa}
@@ -16,6 +24,8 @@ canvas{display:block;width:100%;height:30vh;height:30svh;min-height:150px}
 .transport-button{display:grid;place-items:center;min-height:84px;border:0;border-radius:18px;cursor:pointer;transition:transform .15s,filter .15s;position:relative;color:#101112}
 .transport-button:active:enabled{transform:scale(.95)}
 .record{background:var(--red)}
+.lab:has(.showing-intro) .record{animation:record-invitation 2s ease-in-out infinite}
+@keyframes record-invitation{0%,100%{background:#ae2530;box-shadow:0 0 0 0 #ff454f00}50%{background:#ff6972;box-shadow:0 0 28px 5px #ff454f88}}
 .forward{background:var(--green)}
 .reverse{background:var(--purple)}
 .record-icon{width:30px;height:30px;background:#700b15;border-radius:50%;box-shadow:0 0 0 5px #ffffff30}
@@ -25,6 +35,8 @@ canvas{display:block;width:100%;height:30vh;height:30svh;min-height:150px}
 .selected .play-icon{display:none}
 .selected .stop-icon{display:block}
 .transport-button.selected{box-shadow:inset 0 0 0 3px #ffffff99}
+.recording .record,.transport-button.selected{animation:active-transport 2.4s ease-in-out infinite}
+@keyframes active-transport{0%,100%{filter:brightness(.8)}50%{filter:brightness(1.15)}}
 .transport-button:disabled{cursor:default;filter:saturate(.5);opacity:.42}
 button:focus-visible,input:focus-visible{outline:3px solid white;outline-offset:5px}
 #status{font-size:12px;line-height:1.5;color:#b9bdb5;margin:12px 2px;min-height:18px}
@@ -46,4 +58,4 @@ footer{text-align:center;font-size:10px;letter-spacing:.2px;color:#7f8776;margin
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 @media(min-width:700px){.identity{padding-top:32px;padding-bottom:20px}h1{font-size:80px}.alien{width:100px;height:85px}.transport-button{min-height:96px}}
 @media(max-width:360px){main{padding-left:14px;padding-right:14px}.transport{gap:10px}.transport-button{min-height:72px}.identity{padding:16px 14px}h1{font-size:58px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}.lab:has(.showing-intro) .record,.recording .record,.transport-button.selected{animation:none}.wave-intro path{fill:currentColor}}
