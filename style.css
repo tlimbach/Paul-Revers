@@ -9,8 +9,9 @@ input[type=range] { min-height:44px; margin:5px 0; }
   .brand{font-size:20px;gap:10px}
   .brand-icon{font-size:32px}
   .header-note{display:none}
-  main{padding:0 12px max(18px,env(safe-area-inset-bottom))}
-  .intro{padding:10px 8px 18px;display:block;text-align:center}
+  /* Extra scroll room lets the lowest control move well above browser chrome. */
+  main{padding:0 12px calc(120px + env(safe-area-inset-bottom, 0px))}
+  .intro{display:none}
   .intro .eyebrow,.intro p,.mascot{display:none}
   h1{font-size:25px;letter-spacing:-.8px;line-height:1.2;margin:0}
   h1 br{display:none}
@@ -33,6 +34,44 @@ input[type=range] { min-height:44px; margin:5px 0; }
   .direction small{font-size:12px}
   .sliders{grid-template-columns:1fr;gap:16px;margin-top:18px}
   .slider-card label{font-size:15px}
+  .slider-card{scroll-margin-block:80px}
+  input[type=range]{
+    -webkit-appearance:none;
+    appearance:none;
+    background:transparent;
+    height:48px;
+    min-height:48px;
+    margin:2px 0;
+  }
+  input[type=range]::-webkit-slider-runnable-track{
+    height:8px;
+    background:#ded5f3;
+    border-radius:8px;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:30px;
+    height:30px;
+    margin-top:-11px;
+    border:3px solid white;
+    border-radius:50%;
+    background:#7961cf;
+    box-shadow:0 1px 5px #49366d55;
+  }
+  input[type=range]::-moz-range-track{
+    height:8px;
+    background:#ded5f3;
+    border-radius:8px;
+  }
+  input[type=range]::-moz-range-thumb{
+    box-sizing:border-box;
+    width:30px;
+    height:30px;
+    border:3px solid white;
+    border-radius:50%;
+    background:#7961cf;
+    box-shadow:0 1px 5px #49366d55;
+  }
   output{font-size:12px}
   .range-labels{font-size:12px}
   .challenge{padding:14px;margin:20px 0 18px;gap:10px}
