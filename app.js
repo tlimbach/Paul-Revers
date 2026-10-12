@@ -1,4 +1,4 @@
-import { reverseSamples } from './audio.js';
+import { reverseSamples, PlaybackClock } from './audio.js';
 
 const $ = (id) => document.getElementById(id);
 const recordButton = $('record');
@@ -7,7 +7,7 @@ const pen = canvas.getContext('2d');
 let context, recorder, stream, analyser, mic, original, source;
 let workletReady;
 let recording = false, busy = false, backwards = true;
-let startedAt = 0, playbackStarted = 0, playbackDuration = 0, limitTimer;
+let startedAt = 0, playbackClock, playbackDuration = 0, limitTimer;
 let displayedSamples = null;
 const formatTime = (seconds) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
 
@@ -16,11 +16,17 @@ function syncControls() {
   $('controls').disabled = !original || recording || busy;
   $('reset').disabled = !original || recording || busy;
   recordButton.disabled = busy;
+  const recordLabel = recording ? 'Aufnahme beenden' : original ? 'Neu aufnehmen' : 'Aufnahme starten';
+  recordButton.setAttribute('aria-label', recordLabel);
+  recordButton.title = recordLabel;
   for (const [id, direction] of [['forward', false], ['reverse', true]]) {
     const active = Boolean(source) && backwards === direction;
+    $(id).disabled = !original || recording || busy;
+    const label = active ? 'Wiedergabe stoppen' : direction ? 'Rückwärts abspielen' : 'Vorwärts abspielen';
+    $(id).setAttribute('aria-label', label);
+    $(id).title = label;
     $(id).classList.toggle('selected', active);
     $(id).setAttribute('aria-pressed', String(active));
-    $(id).querySelector('small').textContent = active ? '■ Stoppen' : 'Jetzt abspielen';
   }
 }
 async function audioContext() {
@@ -43,8 +49,6 @@ function stopRecording() {
   recording = false; busy = true;
   recorder.port.postMessage({ type: 'stop' });
   document.body.classList.remove('recording');
-  recordButton.innerHTML = '<span aria-hidden="true">●</span> Neu aufnehmen';
-  $('record-badge').textContent = 'EINEN MOMENT …';
   status('Deine Aufnahme wird vorbereitet …'); syncControls();
 }
 recordButton.addEventListener('click', async () => {
@@ -69,20 +73,15 @@ recordButton.addEventListener('click', async () => {
       releaseMic();
       recorder.disconnect(); recorder.port.close(); recorder = null;
       document.body.classList.remove('recording');
-      recordButton.innerHTML = '<span aria-hidden="true">●</span> Neu aufnehmen';
       try {
         if (data.samples.length < context.sampleRate * .15) throw new Error('short');
         const decoded = context.createBuffer(1, data.samples.length, context.sampleRate);
         decoded.copyToChannel(data.samples, 0);
         original = decoded;
         displayedSamples = original.getChannelData(0);
-        $('record-badge').textContent = 'IM KASTEN!';
-        $('wave-label').textContent = 'Deine Stimme ist bereit';
         $('timer').textContent = formatTime(original.duration);
-        $('record-hint').textContent = 'Noch eine Idee? Nimm einfach etwas Neues auf.';
-        status('Super! Hör dir deine Stimme an – vorwärts oder rückwärts.');
+        status('');
       } catch (error) {
-        $('record-badge').textContent = 'NOCH EIN VERSUCH?';
         status(error.message === 'short'
           ? 'Noch zu kurz! Sprich bitte mindestens eine Sekunde und stoppe dann die Aufnahme.'
           : 'Die Aufnahme konnte nicht verarbeitet werden. Bitte versuche es erneut.');
@@ -93,8 +92,6 @@ recordButton.addEventListener('click', async () => {
       clearTimeout(limitTimer); recording = false; busy = false; releaseMic();
       recorder.disconnect(); recorder.port.close(); recorder = null;
       document.body.classList.remove('recording');
-      recordButton.innerHTML = '<span aria-hidden="true">●</span> Aufnahme starten';
-      $('record-badge').textContent = 'NOCH EIN VERSUCH?';
       status('Die Aufnahme wurde unterbrochen. Versuch es noch einmal.'); syncControls();
     };
     analyser = context.createAnalyser(); analyser.fftSize = 2048;
@@ -104,10 +101,7 @@ recordButton.addEventListener('click', async () => {
     recorder.connect(context.destination);
     recording = true; busy = false; startedAt = performance.now();
     document.body.classList.add('recording');
-    recordButton.innerHTML = '<span aria-hidden="true">■</span> Aufnahme beenden';
-    $('record-badge').textContent = 'PAUL HÖRT ZU';
-    $('wave-label').textContent = 'Sprich, sing oder mach Quatsch!';
-    status('Aufnahme läuft. Nach einer Minute stoppt sie automatisch.');
+    status('Aufnahme läuft · maximal 1 Minute');
     limitTimer = setTimeout(stopRecording, 60_000); syncControls();
   } catch (error) {
     releaseMic(); recorder?.disconnect(); recorder?.port.close(); recorder = null; busy = false;
@@ -124,9 +118,16 @@ recordButton.addEventListener('click', async () => {
 $('forward').addEventListener('click', () => playDirection(false));
 $('reverse').addEventListener('click', () => playDirection(true));
 function updateEffects() {
-  stopPlayback();
   const pitch = Number($('pitch').value);
-  $('pitch-value').textContent = pitch === 0 ? 'Normal' : `${(2 ** (pitch / 12)).toFixed(2).replace('.', ',')}×`;
+  const rate = 2 ** (pitch / 12);
+  $('pitch-value').textContent = pitch === 0 ? 'Normal' : `${rate.toFixed(2).replace('.', ',')}×`;
+  if (source) {
+    const now = context.currentTime;
+    const currentRate = playbackClock.change(now, rate);
+    source.playbackRate.cancelScheduledValues(now);
+    source.playbackRate.setValueAtTime(currentRate, now);
+    source.playbackRate.linearRampToValueAtTime(rate, now + .03);
+  }
 }
 $('pitch').addEventListener('input', updateEffects);
 $('reset').addEventListener('click', () => { $('pitch').value = '0'; updateEffects(); });
@@ -149,9 +150,11 @@ async function playDirection(direction) {
     // Native resampling changes pitch and tempo together without granular overlap.
     source.playbackRate.value = 2 ** (Number($('pitch').value) / 12);
     source.onended = () => { source?.disconnect(); source = null; syncControls(); };
-    playbackStarted = context.currentTime; playbackDuration = buffer.duration / source.playbackRate.value;
-    source.start();
-    status(backwards ? 'Ohren auf: So klingst du rückwärts!' : 'Ohren auf: So klingst du vorwärts!');
+    const startTime = context.currentTime;
+    playbackClock = new PlaybackClock(startTime, source.playbackRate.value);
+    playbackDuration = buffer.duration;
+    source.start(startTime);
+    status('');
   } catch { status('Die Wiedergabe hat nicht geklappt. Versuche es noch einmal.'); }
   finally { busy = false; syncControls(); }
 }
@@ -166,7 +169,7 @@ function draw() {
     $('timer').textContent = `${formatTime(Math.min(60, (performance.now() - startedAt) / 1000))} / 1:00`;
   }
   const count = Math.floor(width / 7);
-  const progress = source ? Math.min(1, (context.currentTime - playbackStarted) / playbackDuration) : 0;
+  const progress = source ? Math.min(1, playbackClock.positionAt(context.currentTime) / playbackDuration) : 0;
   for (let i = 0; i < count; i++) {
     let amplitude = 0;
     if (data?.length) {
@@ -174,8 +177,27 @@ function draw() {
       for (let j = from; j < to; j += Math.max(1, Math.floor((to - from) / 100))) amplitude = Math.max(amplitude, Math.abs(data[j]));
     } else amplitude = .035 + .10 * Math.abs(Math.sin(i * .7)) * Math.sin(Math.PI * i / count) ** 2;
     const bar = Math.max(4, Math.min(height - 8, amplitude * height * 1.8));
-    pen.fillStyle = recording ? '#ed8a76' : source && (backwards ? i / count >= 1 - progress : i / count <= progress) ? '#7961cf' : '#c6b9ed';
+    pen.fillStyle = source && (backwards ? i / count >= 1 - progress : i / count <= progress) ? '#e1ffae' : '#a0ff00';
     pen.beginPath(); pen.roundRect(i * 7, (height - bar) / 2, 3, bar, 2); pen.fill();
+  }
+  if (source) {
+    // Follow the audio clock, including the selected playback speed and direction.
+    const position = backwards ? 1 - progress : progress;
+    const x = 7 + position * Math.max(0, width - 14);
+    pen.save();
+    pen.strokeStyle = '#a01525';
+    pen.fillStyle = '#a01525';
+    pen.lineWidth = 1.5;
+    pen.beginPath();
+    pen.moveTo(x, 12);
+    pen.lineTo(x, height - 12);
+    pen.stroke();
+    // Small handles keep the moving marker visible even over a loud waveform.
+    pen.beginPath();
+    pen.roundRect(x - 3, 5, 6, 10, 2);
+    pen.roundRect(x - 3, height - 15, 6, 10, 2);
+    pen.fill();
+    pen.restore();
   }
   requestAnimationFrame(draw);
 }

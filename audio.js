@@ -3,6 +3,41 @@ export function reverseSamples(samples) {
   return Float32Array.from(samples).reverse();
 }
 
+/** Integrate the same linear speed ramps used by the audio source. */
+export class PlaybackClock {
+  constructor(time, rate) {
+    this.time = time;
+    this.offset = 0;
+    this.from = rate;
+    this.to = rate;
+    this.ramp = 0;
+  }
+
+  rateAt(time) {
+    const fraction = this.ramp ? Math.min(1, Math.max(0, time - this.time) / this.ramp) : 1;
+    return this.from + (this.to - this.from) * fraction;
+  }
+
+  positionAt(time) {
+    const elapsed = Math.max(0, time - this.time);
+    const rampTime = Math.min(elapsed, this.ramp);
+    const rampDistance = this.ramp
+      ? this.from * rampTime + (this.to - this.from) * rampTime ** 2 / (2 * this.ramp)
+      : 0;
+    return this.offset + rampDistance + this.to * (elapsed - rampTime);
+  }
+
+  change(time, rate, ramp = .03) {
+    const from = this.rateAt(time);
+    this.offset = this.positionAt(time);
+    this.time = time;
+    this.from = from;
+    this.to = rate;
+    this.ramp = ramp;
+    return from;
+  }
+}
+
 /** Overlap short, windowed grains to change pitch independently of duration.
  * This deliberately simple effect is suitable for voices, not studio mastering.
  */

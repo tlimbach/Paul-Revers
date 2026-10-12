@@ -28,7 +28,7 @@ Die Aufnahme bleibt im Arbeitsspeicher des Browsers. Es gibt keine Uploads, Benu
 - `server.js`: kleiner lokaler Entwicklungsserver.
 - `tests/audio.test.js`: automatisierte Prüfungen der Klangverarbeitung (`npm test`).
 
-Testvariante: Ein gemeinsamer Regler steuert Tonhöhe und Tempo über die native `playbackRate` der Web Audio API. Höher bedeutet schneller, tiefer bedeutet langsamer (−12 bis +12 Halbtöne entsprechen 0,5–2×). Die Wiedergabe verwendet keine überlagerten Audioausschnitte mehr. Regleränderungen stoppen die Wiedergabe und gelten beim nächsten Start. Der frühere Granular-Algorithmus in `audio.js` bleibt vorerst zum Vergleich im Quellcode erhalten, wird aber nicht verwendet.
+Testvariante: Ein gemeinsamer Regler steuert Tonhöhe und Tempo über die native `playbackRate` der Web Audio API. Höher bedeutet schneller, tiefer bedeutet langsamer (−12 bis +12 Halbtöne entsprechen 0,5–2×). Die Wiedergabe verwendet keine überlagerten Audioausschnitte mehr. Regleränderungen wirken direkt während der Wiedergabe, mit einem weichen Übergang von 30 Millisekunden. Der Abspielzeiger berücksichtigt die wechselnde Geschwindigkeit in beiden Richtungen. Der frühere Granular-Algorithmus in `audio.js` bleibt vorerst zum Vergleich im Quellcode erhalten, wird aber nicht verwendet.
 
 ## Mögliche Etappen
 
