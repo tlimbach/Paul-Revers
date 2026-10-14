@@ -2,6 +2,12 @@ import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 
 const files = { '/fonts/Orbitron.ttf': ['fonts/Orbitron.ttf', 'font/ttf'], '/recorder-worklet.js': ['recorder-worklet.js', 'text/javascript'], '/': ['index.html', 'text/html'], '/style.css': ['style.css', 'text/css'], '/app.js': ['app.js', 'text/javascript'], '/audio.js': ['audio.js', 'text/javascript'] };
+files['/manifest.webmanifest'] = ['manifest.webmanifest', 'application/manifest+json'];
+files['/icons/alien.svg'] = ['icons/alien.svg', 'image/svg+xml'];
+for (const name of ['icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'favicon-32.png']) {
+  files[`/icons/${name}`] = [`icons/${name}`, 'image/png'];
+}
+
 http.createServer(async (request, response) => {
   const file = files[new URL(request.url, 'http://localhost').pathname];
   if (!file) { response.writeHead(404); response.end('Nicht gefunden'); return; }
