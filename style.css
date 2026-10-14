@@ -61,4 +61,3 @@ footer{text-align:center;font-size:10px;letter-spacing:.2px;color:#7f8776;margin
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 @media(min-width:700px){.identity{padding-top:32px;padding-bottom:20px}h1{font-size:80px}.alien{width:100px;height:85px}.transport-button{min-height:96px}}
 @media(max-width:360px){main{padding-left:14px;padding-right:14px}.transport{gap:10px}.transport-button{min-height:72px}.identity{padding:16px 14px}h1{font-size:58px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}.lab:has(.showing-intro) .record,.recording .record,.transport-button.selected{animation:none}.wave-intro path{fill:currentColor}.wave-intro p span{background-image:none;color:#989d96}}

@@ -11,7 +11,6 @@ const introTexts = waveIntro.querySelectorAll('p span');
 const introAnimationStart = performance.now();
 const paulGlow = $('paul-glow');
 const paulOutline = $('paul-outline');
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let glowLevel = 0, lastGlowTime = performance.now();
 let playbackAnalyser, playbackLevels;
 const micLevels = new Float32Array(2048);
@@ -238,7 +237,7 @@ function updatePaulGlow(samples) {
   if (samples) for (const sample of samples) energy += sample * sample;
   const rms = samples?.length ? Math.sqrt(energy / samples.length) : 0;
   // Quiet phone recordings need a stronger visual response than a linear meter.
-  const target = reducedMotion.matches ? 0 : Math.min(1, Math.max(0, (rms - .002) * 28) ** .5);
+  const target = Math.min(1, Math.max(0, (rms - .002) * 28) ** .5);
   const now = performance.now();
   const elapsed = Math.min(.1, Math.max(0, (now - lastGlowTime) / 1000));
   lastGlowTime = now;
@@ -252,7 +251,7 @@ function updatePaulGlow(samples) {
 }
 
 function draw() {
-  if (!waveIntro.hidden && !reducedMotion.matches) {
+  if (!waveIntro.hidden) {
     const phase = ((performance.now() - introAnimationStart) % 2400) / 2400;
     const forwardX = -32 + 224 * Math.min(1, phase / .45);
     const reverseX = 192 - 224 * Math.max(0, Math.min(1, (phase - .5) / .45));
